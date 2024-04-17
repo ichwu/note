@@ -2,7 +2,7 @@ import {Context} from 'koa'
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 import {findUserByEmail, findUserByUsername, createUser} from '../services/userService'
-import { addToBlacklist } from "../services/tokenBlockListService";
+import {addToBlacklist} from "../services/tokenBlockListService";
 
 const secret = process.env.TOKEN_SECRET || 'your-secret-key'
 
@@ -66,7 +66,7 @@ const authController = {
             return;
         }
         try {
-            const token = jwt.sign({username}, secret, {expiresIn: 90 * 1000});
+            const token = jwt.sign({username}, secret, {expiresIn: '3d'});
             ctx.body = {message: 'Login successfully', token};
         } catch (error) {
             ctx.status = 500;
@@ -75,19 +75,14 @@ const authController = {
     },
     logout: async (ctx: Context) => {
         try {
-            // 清除客户端保存的 JWT
-            // 这里假设客户端将 JWT 存储在本地存储中
-            // 如果存储在 Cookie 中，也可以通过设置 Cookie 的过期时间来清除
-            // 或者使用其他方式清除客户端的 JWT
-            // clearClientToken(decoded.userId);
-            const token = ctx.state.token
+            // 清除客户端保存的 JWT，如果存储在 Cookie 中，也可以通过设置 Cookie 的过期时间来清除
+            const token = ctx.request.headers.authorization?.split(' ')[1] || '';
             const time = ctx.state.user?.exp || new Date().getTime()
-            await  addToBlacklist(token, new Date(time * 1000))
+            await addToBlacklist(token, new Date(time * 1000))
             ctx.body = {message: 'Logout successful', info: ctx.state.user};
         } catch (error) {
-            console.log(error)
             ctx.status = 401;
-            ctx.body = {error: 'Invalid or expired token', };
+            ctx.body = {error: 'Invalid or expired token',};
         }
     }
 };

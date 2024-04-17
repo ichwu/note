@@ -1,45 +1,48 @@
-import { Context, Next } from 'koa';
+import {Context, Next} from 'koa';
 import koaJwt from 'koa-jwt';
-import jwt from 'jsonwebtoken';
-import { TokenBlacklist } from "../models/TokenBlacklist";
+import {TokenBlacklist} from "../models/TokenBlacklist";
 
 const secret = process.env.TOKEN_SECRET || 'your-secret-key'
 
-const authMiddleware = async (ctx: Context, next: Next) => {
-    // 从请求头中获取 Token
-    const token = ctx.request.headers.authorization?.split(' ')[1];
-
-    if (!token) {
-        ctx.status = 401; // Unauthorized
-        ctx.body = { error: 'Token not provided' };
-        return;
-    }
-
+export const tokenInterceptorErrorMiddleware = async (ctx: Context, next: Next) => {
     try {
-        // 验证 Token 的合法性
-        const decodedToken = jwt.verify(token, secret);
-
-        // 检查 Token 是否在黑名单中
-        const blacklistedToken = await TokenBlacklist.findOne({ token });
-        if (blacklistedToken) {
-            ctx.status = 401; // Unauthorized
-            ctx.body = { error: 'Token is blacklisted' };
-            return;
+        await next()
+    } catch (error: any) {
+        if (error.status === 401) {
+            ctx.status = 401;
+            ctx.body = {error: 'Protected resource, use Authorization header to get access\n'}; // 自定义错误消息
+        } else {
+            throw error; // 抛出其他错误，交给全局错误处理
         }
-
-        // 将解码后的 Token 数据存储在 ctx.state 中，方便后续路由处理函数使用
-        ctx.state.token = token;
-        ctx.state.user = decodedToken;
-
-        await next(); // 继续执行下一个中间件或路由处理函数
-    } catch (error) {
-        ctx.status = 401; // Unauthorized
-        ctx.body = { error: 'Invalid token' };
     }
-};
+}
 
-export const tokenInterceptor = koaJwt({ secret }).unless({
-    path: [/^\/public/, /login/, /register/]
+export const tokenInterceptorWhiteListMiddleware = koaJwt({secret}).unless({
+    path: [/^\/public/, /\/login/, /\/register/]
 });
 
-export default authMiddleware;
+export const tokenInterceptorBlackListMiddleware = async (ctx: Context, next: Next) => {
+    // 这里检查 ctx.state.user 是否存在，如果存在，表示已通过 JWT 验证
+    if (ctx.state.user) {
+        try {
+            // 如果需要验证的路径，可以在这里执行一些自定义逻辑
+            const token = ctx.request.headers.authorization?.split(' ')[1] || '';
+            // 检查 Token 是否在黑名单中
+            const blacklistedToken = await TokenBlacklist.findOne({token});
+            if (blacklistedToken) {
+                ctx.status = 401; // Unauthorized
+                ctx.body = {error: 'Token is blacklisted'};
+                return;
+            }
+            // 然后继续执行下一个中间件
+            await next();
+        } catch (e) {
+            // 可以在这里处理错误
+            ctx.status = 401;
+            ctx.body = {error: 'Protected resource, use Authorization header to get access\n'};
+        }
+    } else {
+        // 如果不需要验证的路径，则直接执行下一个中间件
+        await next();
+    }
+};
