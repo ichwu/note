@@ -18,7 +18,7 @@ export const tokenInterceptorErrorMiddleware = async (ctx: Context, next: Next) 
 }
 
 export const tokenInterceptorWhiteListMiddleware = koaJwt({secret}).unless({
-    path: [/^\/public/, /\/login/, /\/register/]
+    path: [/^\/public/, /\/login/, /\/register/, /\/openapi/]
 });
 
 export const tokenInterceptorBlackListMiddleware = async (ctx: Context, next: Next) => {

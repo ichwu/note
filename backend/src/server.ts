@@ -5,17 +5,21 @@ import cors from '@koa/cors';
 import dotenv from 'dotenv';
 import authRouter from './routes/authRoute';
 import userRouter from './routes/userRoute';
+import apiRouter from './routes/apiRoute';
 import connectToDatabase from './database';
-import helmet from 'koa-helmet';
+import compress from 'koa-compress';
+import serve from 'koa-static';
 import {
     tokenInterceptorErrorMiddleware,
     tokenInterceptorWhiteListMiddleware,
 } from './middlewares/authMiddleware';
 import responseTimeMiddleware from "./middlewares/responseTimeMiddleware";
 import handleUndefinedRoutes from "./middlewares/handleUndefinedRoutes";
-import loggerMiddleware from './middlewares/loggerMiddleware'
+import loggerMiddleware from './middlewares/loggerMiddleware';
 import errorMiddleware from "./middlewares/errorMiddleware";
-
+import rateLimitMiddleware from "./middlewares/rateLimitMiddleware";
+import swaggerMiddleware from "./middlewares/swaggerMiddleware";
+import helmetMiddleware from "./middlewares/helmetMiddleware";
 
 // 加载环境变量
 dotenv.config();
@@ -30,7 +34,7 @@ connectToDatabase();
 app.use(errorMiddleware);
 
 // 使用 helmet 中间件增强安全性
-app.use(helmet());
+app.use(helmetMiddleware);
 
 // 设置跨域
 app.use(cors());
@@ -44,6 +48,18 @@ app.use(responseTimeMiddleware);
 // 日志中间件
 app.use(loggerMiddleware)
 
+// 响应压缩
+app.use(compress())
+
+// 添加限流中间件，防止DDOS攻击
+app.use(rateLimitMiddleware)
+
+// 静态文件服务
+app.use(serve('./public'))
+
+// 使用 Swagger 中间件
+app.use(swaggerMiddleware)
+
 // 添加 token 拦截中间件
 app.use(tokenInterceptorErrorMiddleware)
     .use(tokenInterceptorWhiteListMiddleware)
@@ -54,6 +70,9 @@ app.use(authRouter.routes());
 
 // 添加用户相关的路由
 app.use(userRouter.routes());
+
+// 添加 swagger openapi 相关的路由
+app.use(apiRouter.routes());
 
 // 使用处理未定义的接口的中间件
 app.use(handleUndefinedRoutes);
