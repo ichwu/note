@@ -10,12 +10,12 @@ export const paginate = async <T extends Document>(
     model: Model<T>,
     ctx: ParameterizedContext,
     queryParams: QueryParams = {}
-): Promise<{ data: T[]; pagination: { page: number; limit: number; totalCount: number; totalPages: number } }> => {
+): Promise<{ data: T[]; pagination: { pageNum: number; pageSize: number; total: number } }> => {
 
     const totalCount = await model.countDocuments(queryParams as FilterQuery<T>); // 查询总记录数
     const page = parseInt(ctx.query.page as string) || 1; // 获取页码，默认为第一页
     const limit = parseInt(ctx.query.limit as string) || totalCount; // 获取每页记录数，默认为全部
-    const totalPages = Math.ceil(totalCount / limit); // 计算总页数
+    // const totalPages = Math.ceil(totalCount / limit); // 计算总页数
 
     let query = model.find(queryParams as FilterQuery<T>);
 
@@ -33,10 +33,9 @@ export const paginate = async <T extends Document>(
     return {
         data,
         pagination: {
-            page,
-            limit,
-            totalCount,
-            totalPages
+            pageNum: page,
+            pageSize: limit,
+            total: totalCount,
         }
     };
 };

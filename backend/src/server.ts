@@ -1,3 +1,5 @@
+import fs from 'fs';
+import path from 'path';
 import Koa from 'koa';
 import Router from 'koa-router';
 import bodyParser from 'koa-bodyparser';
@@ -10,6 +12,7 @@ import connectToDatabase from './database';
 import compress from 'koa-compress';
 import serve from 'koa-static';
 import {
+    tokenInterceptorBlackListMiddleware,
     tokenInterceptorErrorMiddleware,
     tokenInterceptorWhiteListMiddleware,
 } from './middlewares/authMiddleware';
@@ -65,14 +68,23 @@ app.use(tokenInterceptorErrorMiddleware)
     .use(tokenInterceptorWhiteListMiddleware)
     // .use(tokenInterceptorBlackListMiddleware);
 
-// 添加认证相关的路由
-app.use(authRouter.routes());
+// // 添加认证相关的路由
+// app.use(authRouter.routes());
+//
+// // 添加用户相关的路由
+// app.use(userRouter.routes());
+//
+// // 添加 swagger openapi 相关的路由
+// app.use(apiRouter.routes());
 
-// 添加用户相关的路由
-app.use(userRouter.routes());
-
-// 添加 swagger openapi 相关的路由
-app.use(apiRouter.routes());
+// 批量导入 routes 目录下的路由
+const routesPath = path.join(__dirname, 'routes');
+fs.readdirSync(routesPath).forEach(file => {
+    if (file.endsWith('.ts')) {
+        const route = require(path.join(routesPath, file)).default;
+        app.use(route.routes());
+    }
+});
 
 // 使用处理未定义的接口的中间件
 app.use(handleUndefinedRoutes);

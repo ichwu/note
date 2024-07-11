@@ -1,6 +1,7 @@
 import {Context, Next} from 'koa';
 import koaJwt from 'koa-jwt';
 import {TokenBlacklist} from "../models/TokenBlacklist";
+import { sendErrorResponse } from "../helpers/responseHelper";
 
 const secret = process.env.TOKEN_SECRET || 'your-secret-key'
 
@@ -8,17 +9,12 @@ export const tokenInterceptorErrorMiddleware = async (ctx: Context, next: Next) 
     try {
         await next()
     } catch (error: any) {
-        if (error.status === 401) {
-            ctx.status = 401;
-            ctx.body = {error: 'Protected resource, use Authorization header to get access\n'}; // 自定义错误消息
-        } else {
-            throw error; // 抛出其他错误，交给全局错误处理
-        }
+        sendErrorResponse(ctx, error.status, error.message)
     }
 }
 
 export const tokenInterceptorWhiteListMiddleware = koaJwt({secret}).unless({
-    path: [/^\/public/, /\/login/, /\/register/, /\/openapi/]
+    path: [/^\/public/, /\/login/, /\/register/, /\/openapi/, /\/doc/]
 });
 
 export const tokenInterceptorBlackListMiddleware = async (ctx: Context, next: Next) => {
@@ -30,16 +26,13 @@ export const tokenInterceptorBlackListMiddleware = async (ctx: Context, next: Ne
             // 检查 Token 是否在黑名单中
             const blacklistedToken = await TokenBlacklist.findOne({token});
             if (blacklistedToken) {
-                ctx.status = 401; // Unauthorized
-                ctx.body = {error: 'Token is blacklisted'};
+                sendErrorResponse(ctx, 401, 'Token is blacklisted')
                 return;
             }
             // 然后继续执行下一个中间件
             await next();
-        } catch (e) {
-            // 可以在这里处理错误
-            ctx.status = 401;
-            ctx.body = {error: 'Protected resource, use Authorization header to get access\n'};
+        } catch (error: any) {
+            sendErrorResponse(ctx, error.status, error.message)
         }
     } else {
         // 如果不需要验证的路径，则直接执行下一个中间件

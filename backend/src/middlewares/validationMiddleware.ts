@@ -1,5 +1,6 @@
 import {Context, Next} from 'koa';
 import Joi, {ObjectSchema, ValidationError} from 'joi';
+import {sendErrorResponse} from "../helpers/responseHelper";
 
 // 定义错误消息集合
 const errorMessages = {
@@ -53,12 +54,11 @@ const validateMiddleware = (schema: ObjectSchema) => {
             ctx.request.body = await schema.validateAsync(ctx.request.body); // 更新请求体为校验后的数据
             await next();
         } catch (error) {
-            ctx.status = 400;
             // 使用类型断言告诉 TypeScript error 的确切类型
             const validationError = error as ValidationError;
             const details = validationError.details || [];
             const errorMessage = details.length > 0 ? details[0].message : '校验失败';
-            ctx.body = {error: errorMessage};
+            sendErrorResponse(ctx, 400, errorMessage)
         }
     };
 };
