@@ -1,4 +1,4 @@
-Server
+MongoDB Server
 ===
 
 创建.env文件
@@ -9,6 +9,11 @@ DATABASE_URL=mongodb://username:password@ip:27017/databaseName?authSource=admin
 ```
 
 测试运行
+```shell
+nodemon --watch src --exec ts-node src/server.ts 
+```
+
+ApiFox 文档地址
 ```shell
 nodemon --watch src --exec ts-node src/server.ts 
 ```

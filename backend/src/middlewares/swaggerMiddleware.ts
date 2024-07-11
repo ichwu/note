@@ -15,8 +15,6 @@ const swaggerOptions = {
     apis: [path.resolve(__dirname, '../routes/*.ts'), path.resolve(__dirname, '../models/*.ts')],
 };
 
-// console.log(require(path.resolve(__dirname, '../routes/userRoute.ts')))
-
 // 初始化 swagger-jsdoc
 const swaggerSpec = swaggerJSDoc(swaggerOptions);
 

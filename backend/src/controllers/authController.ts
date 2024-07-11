@@ -3,6 +3,7 @@ import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 import {findUserByEmail, findUserByUsername, createUser} from '../services/userService'
 import {addToBlacklist} from "../services/tokenBlockListService";
+import { sendSuccessResponse, sendErrorResponse } from '../helpers/responseHelper'
 
 const secret = process.env.TOKEN_SECRET || 'your-secret-key'
 
@@ -22,15 +23,13 @@ const authController = {
         const {username, password, email} = ctx.request.body as RegisterRequestBody;
         // 判断用户名是否存在
         if (await findUserByUsername(username)) {
-            ctx.status = 400;
-            ctx.body = {error: 'Username already exists'};
+            sendErrorResponse(ctx, 400, 'Username already exists')
             return;
         }
 
         // 判断邮件是否存在
         if (await findUserByEmail(email)) {
-            ctx.status = 400;
-            ctx.body = {error: 'Email already exists'};
+            sendErrorResponse(ctx, 400, 'Email already exists')
             return;
         }
 
@@ -41,11 +40,9 @@ const authController = {
             await createUser({
                 username, password: hashedPassword, email
             })
-            ctx.status = 201;
-            ctx.body = {message: 'success'};
+            sendSuccessResponse(ctx)
         } catch (error) {
-            ctx.status = 500;
-            ctx.body = {error: 'Internal Server Error'};
+            sendErrorResponse(ctx, 500, 'Internal Server Error')
         }
     },
     login: async (ctx: Context) => {
@@ -53,24 +50,21 @@ const authController = {
         // 判断用户名是否存在
         const user = await findUserByUsername(username);
         if (!user) {
-            ctx.status = 400;
-            ctx.body = {error: 'Invalid username or password'};
+            sendErrorResponse(ctx, 400, 'Invalid username or password')
             return;
         }
 
         // 使用 bcryptjs 验证密码是否正确
         const passwordMatch = await bcrypt.compare(password, user.password);
         if (!passwordMatch) {
-            ctx.status = 401;
-            ctx.body = {error: 'Invalid username or password'};
+            sendErrorResponse(ctx, 401, 'Invalid username or password')
             return;
         }
         try {
             const token = jwt.sign({username}, secret, {expiresIn: '3d'});
-            ctx.body = {message: 'Login successfully', token};
+            sendSuccessResponse(ctx, token)
         } catch (error) {
-            ctx.status = 500;
-            ctx.body = {error: 'Internal Server Error'};
+            sendErrorResponse(ctx, 500, 'Internal Server Error')
         }
     },
     logout: async (ctx: Context) => {
@@ -79,10 +73,9 @@ const authController = {
             const token = ctx.request.headers.authorization?.split(' ')[1] || '';
             const time = ctx.state.user?.exp || new Date().getTime()
             await addToBlacklist(token, new Date(time * 1000))
-            ctx.body = {message: 'Logout successful', info: ctx.state.user};
+            sendSuccessResponse(ctx, ctx.state.user)
         } catch (error) {
-            ctx.status = 401;
-            ctx.body = {error: 'Invalid or expired token',};
+            sendErrorResponse(ctx, 401, 'Invalid or expired token')
         }
     }
 };
