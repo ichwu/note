@@ -1,8 +1,9 @@
 import Router from 'koa-router';
 import authController from '../controllers/authController';
-import { validateMiddleware, loginSchema } from '../middlewares/validationMiddleware'
+import {validateMiddleware, loginSchema, userAddSchema} from '../middlewares/validationMiddleware'
+import userController from "../controllers/userController";
 
-const authRouter = new Router();
+const router = new Router();
 
 /**
  * @swagger
@@ -46,7 +47,37 @@ const authRouter = new Router();
  *       401:
  *         description: 用户名或密码错误
  */
-authRouter.post('/login', validateMiddleware(loginSchema), authController.login);
+router.post('/login', validateMiddleware(loginSchema), authController.login);
+
+/**
+ * @swagger
+ * /register:
+ *   post:
+ *     summary: 用户注册
+ *     tags: [Authentication]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               username:
+ *                 type: string
+ *                 example: "newuser"
+ *               password:
+ *                 type: string
+ *                 example: "password123"
+ *               email:
+ *                 type: string
+ *                 example: "newuser@example.com"
+ *     responses:
+ *       201:
+ *         description: 用户添加成功
+ *       400:
+ *         description: 请求体验证失败
+ */
+router.post('/register', validateMiddleware(userAddSchema), userController.addUser);
 
 /**
  * @swagger
@@ -60,6 +91,6 @@ authRouter.post('/login', validateMiddleware(loginSchema), authController.login)
  *       401:
  *         description: 用户未登录或无效的会话
  */
-authRouter.post('/logout', authController.logout);
+router.post('/logout', authController.logout);
 
-export default authRouter;
+export default router;
