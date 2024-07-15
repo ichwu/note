@@ -14,11 +14,10 @@ const userController = {
     /** 获取所有用户 **/
     getAllUsers: async (ctx: any) => {
         const queryParams: QueryParams = {};
-        // 如果请求中包含用户名参数，则设置模糊查询条件
+        // 如果请求中包含参数，则设置模糊查询条件
         if (ctx.query.username) {
             queryParams['username'] = {$regex: new RegExp(ctx.query.username, 'i')};
         }
-
         try {
             // 使用 paginate 函数对用户模型进行分页查询
             const {data, pagination} = await paginate<IUser>(User, ctx, queryParams);
