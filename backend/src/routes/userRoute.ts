@@ -1,6 +1,7 @@
 import Router from 'koa-router';
 import userController from '../controllers/userController';
-import {validateMiddleware, userUpdateSchema, userAddSchema} from "../middlewares/validationMiddleware";
+import validateMiddleware from "../middlewares/validationMiddleware";
+import {userAddSchema, userUpdateSchema} from "../rules/user";
 
 const userRouter = new Router();
 

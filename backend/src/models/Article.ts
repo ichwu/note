@@ -1,6 +1,7 @@
 import {Schema, model, Document} from 'mongoose';
 
 export interface IArticle extends Document {
+    userId: string;
     articleId: string;
     articleParentId: string;
     title: string;
@@ -10,6 +11,7 @@ export interface IArticle extends Document {
 }
 
 const ArticleSchema = new Schema<IArticle>({
+    userId: {type: String, required: true},
     articleId: {type: String, required: true},
     articleParentId: {type: String, required: true},
     title: {type: String},

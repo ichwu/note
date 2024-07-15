@@ -1,6 +1,7 @@
 import { Context } from 'koa';
 import { sendSuccessResponse, sendErrorResponse } from '../helpers/responseHelper';
 import { IArticle, Article } from '../models/Article';
+import {User} from "../models/User";
 
 interface QueryParams {
     [key: string]: any;
@@ -38,8 +39,14 @@ const articleController = {
 
     createArticle: async (ctx: Context) => {
         const { articleId, articleParentId, title, content } = ctx.request.body as IArticle;
+        const user = await User.findOne({username: ctx.state.user.username});
+        if (!user) {
+            sendErrorResponse(ctx, 500, 'User not found');
+            return
+        }
         try {
             const newArticle = new Article({
+                userId: user?.id,
                 articleId,
                 articleParentId,
                 title,
@@ -48,7 +55,7 @@ const articleController = {
                 modify: Date.now() // 设置修改时间
             });
             await newArticle.save();
-            sendSuccessResponse(ctx, { article: newArticle });
+            sendSuccessResponse(ctx, newArticle);
         } catch (error: any) {
             sendErrorResponse(ctx, 500, error.message);
         }
