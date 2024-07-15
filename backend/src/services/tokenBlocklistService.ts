@@ -1,7 +1,7 @@
-import { TokenBlacklist } from '../models/TokenBlacklist';
+import { TokenBlocklist } from '../models/TokenBlocklist';
 
-export async function addToBlacklist(token: string, expiresAt: Date): Promise<void> {
-    await TokenBlacklist.create({ token, expiresAt });
+export async function addToBlocklist(token: string, expiresAt: Date): Promise<void> {
+    await TokenBlocklist.create({ token, expiresAt });
 }
 
 // export async function clearExpiredTokens(): Promise<void> {

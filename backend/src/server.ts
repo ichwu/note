@@ -1,13 +1,12 @@
+import dotenv from 'dotenv';
+/** 需要放到开头，以免调用和定义 secret 的值不一致 **/
+dotenv.config();
 import fs from 'fs';
 import path from 'path';
 import Koa from 'koa';
 import Router from 'koa-router';
 import bodyParser from 'koa-bodyparser';
 import cors from '@koa/cors';
-import dotenv from 'dotenv';
-import authRouter from './routes/authRoute';
-import userRouter from './routes/userRoute';
-import apiRouter from './routes/apiRoute';
 import connectToDatabase from './database';
 import compress from 'koa-compress';
 import serve from 'koa-static';
@@ -23,9 +22,6 @@ import errorMiddleware from "./middlewares/errorMiddleware";
 import rateLimitMiddleware from "./middlewares/rateLimitMiddleware";
 import swaggerMiddleware from "./middlewares/swaggerMiddleware";
 import helmetMiddleware from "./middlewares/helmetMiddleware";
-
-// 加载环境变量
-dotenv.config();
 
 const app = new Koa();
 const router = new Router();
@@ -66,16 +62,7 @@ app.use(swaggerMiddleware)
 // 添加 token 拦截中间件
 app.use(tokenInterceptorErrorMiddleware)
     .use(tokenInterceptorWhiteListMiddleware)
-    // .use(tokenInterceptorBlackListMiddleware);
-
-// // 添加认证相关的路由
-// app.use(authRouter.routes());
-//
-// // 添加用户相关的路由
-// app.use(userRouter.routes());
-//
-// // 添加 swagger openapi 相关的路由
-// app.use(apiRouter.routes());
+    .use(tokenInterceptorBlackListMiddleware);
 
 // 批量导入 routes 目录下的路由
 const routesPath = path.join(__dirname, 'routes');

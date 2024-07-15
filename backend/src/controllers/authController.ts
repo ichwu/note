@@ -2,7 +2,7 @@ import { Context } from 'koa'; // 导入 Koa 的 Context 类型
 import jwt from 'jsonwebtoken'; // 导入 JWT 模块
 import bcrypt from 'bcryptjs'; // 导入 bcrypt 模块
 import { findUserByEmail, findUserByUsername, createUser } from '../services/userService'; // 导入用户服务函数
-import { addToBlacklist } from '../services/tokenBlockListService'; // 导入令牌黑名单服务函数
+import { addToBlocklist } from '../services/tokenBlocklistService'; // 导入令牌黑名单服务函数
 import { sendSuccessResponse, sendErrorResponse } from '../helpers/responseHelper'; // 导入成功和失败响应函数
 
 const secret = process.env.TOKEN_SECRET || 'your-secret-key'; // 设置 JWT 密钥，默认为 'your-secret-key'
@@ -41,7 +41,11 @@ const authController = {
             // 使用 bcrypt 对密码进行哈希处理
             const hashedPassword = await bcrypt.hash(password, 10);
             // 将用户名、哈希后的密码和邮箱存储到数据库中
-            await createUser({ username, password: hashedPassword, email });
+            await createUser({
+                username,
+                password: hashedPassword,
+                email,
+                role: username === 'admin' ? 'admin' : 'user' });
             // 发送成功响应
             sendSuccessResponse(ctx);
         } catch (error: any) {
@@ -87,7 +91,7 @@ const authController = {
             // 获取当前用户的过期时间，若不存在则使用当前时间戳
             const time = ctx.state.user?.exp || Date.now();
             // 将 token 添加至黑名单，并设置过期时间
-            await addToBlacklist(token, new Date(time * 1000));
+            await addToBlocklist(token, new Date(time * 1000));
             // 发送成功响应，返回当前用户信息
             sendSuccessResponse(ctx, ctx.state.user);
         } catch (error: any) {

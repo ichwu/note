@@ -1,6 +1,6 @@
 import { User, IUser } from '../models/User';
 
-export const createUser = async (userData: Pick<IUser, 'username' | 'email' | 'password'>): Promise<IUser> => {
+export const createUser = async (userData: Pick<IUser, 'username' | 'email' | 'password' | 'role'>): Promise<IUser> => {
     const user = new User(userData);
     return user.save();
 };
