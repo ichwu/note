@@ -29,7 +29,9 @@
     "koa-static": "^5.0.0",
     "koa2-swagger-ui": "^5.10.0",
     "mongoose": "^8.3.1",
+    "nanoid": "^3.3.7",
     "swagger-jsdoc": "^6.2.8",
+    "uuid": "^10.0.0",
     "winston": "^3.13.0"
   },
   "devDependencies": {
@@ -39,6 +41,7 @@
     "@types/koa-bodyparser": "^4.3.12",
     "@types/koa-router": "^7.4.8",
     "@types/koa__cors": "^5.0.0",
+    "@types/uuid": "^10.0.0",
     "typescript": "^5.4.5"
   }
 }

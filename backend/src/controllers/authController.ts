@@ -4,6 +4,7 @@ import bcrypt from 'bcryptjs'; // 导入 bcrypt 模块
 import { findUserByEmail, findUserByUsername, createUser } from '../services/userService'; // 导入用户服务函数
 import { addToBlocklist } from '../services/tokenBlocklistService'; // 导入令牌黑名单服务函数
 import { sendSuccessResponse, sendErrorResponse } from '../helpers/responseHelper'; // 导入成功和失败响应函数
+import { nanoid } from "nanoid";
 
 const secret = process.env.TOKEN_SECRET || 'your-secret-key'; // 设置 JWT 密钥，默认为 'your-secret-key'
 
@@ -21,37 +22,6 @@ interface RegisterRequestBody {
 }
 
 const authController = {
-    // 注册用户的控制器方法
-    register: async (ctx: Context) => {
-        const { username, password, email } = ctx.request.body as RegisterRequestBody;
-
-        // 判断用户名是否已存在
-        if (await findUserByUsername(username)) {
-            sendErrorResponse(ctx, 400, 'Username already exists');
-            return;
-        }
-
-        // 判断邮箱是否已存在
-        if (await findUserByEmail(email)) {
-            sendErrorResponse(ctx, 400, 'Email already exists');
-            return;
-        }
-
-        try {
-            // 使用 bcrypt 对密码进行哈希处理
-            const hashedPassword = await bcrypt.hash(password, 10);
-            // 将用户名、哈希后的密码和邮箱存储到数据库中
-            await createUser({
-                username,
-                password: hashedPassword,
-                email,
-                role: username === 'admin' ? 'admin' : 'user' });
-            // 发送成功响应
-            sendSuccessResponse(ctx);
-        } catch (error: any) {
-            sendErrorResponse(ctx, 500, error.message);
-        }
-    },
 
     // 用户登录的控制器方法
     login: async (ctx: Context) => {
