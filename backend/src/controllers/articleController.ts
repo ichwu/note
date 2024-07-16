@@ -28,7 +28,7 @@ const articleController = {
     },
 
     /** 添加文章 **/
-    createArticle: async (ctx: any) => {
+    addArticle: async (ctx: any) => {
         const {articleId, articleParentId, title, content} = ctx.request.body as IArticle;
         const user = await User.findOne({username: ctx.state.user.username});
         if (!user) {
@@ -53,7 +53,7 @@ const articleController = {
     },
 
     /** 获取文章详情 **/
-    getArticleDetailById: async (ctx: any) => {
+    getArticleDetail: async (ctx: any) => {
         const articleId = ctx.params.id;
         try {
             const article = await Article.findOne({ articleId });

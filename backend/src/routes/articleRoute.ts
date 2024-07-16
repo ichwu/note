@@ -93,7 +93,7 @@ router.get('/articles', articleController.getAllArticles);
  *       500:
  *         description: 服务器错误
  */
-router.post('/article', validateMiddleware(articleAddSchema), articleController.createArticle);
+router.post('/article', validateMiddleware(articleAddSchema), articleController.addArticle);
 
 /**
  * @swagger
@@ -130,7 +130,7 @@ router.post('/article', validateMiddleware(articleAddSchema), articleController.
  *       500:
  *         description: 服务器错误
  */
-router.get('/article/:id', articleController.getArticleDetailById);
+router.get('/article/:id', articleController.getArticleDetail);
 
 /**
  * @swagger
