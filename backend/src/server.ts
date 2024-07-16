@@ -67,7 +67,7 @@ app.use(tokenInterceptorErrorMiddleware)
 // 批量导入 routes 目录下的路由
 const routesPath = path.join(__dirname, 'routes');
 fs.readdirSync(routesPath).forEach(file => {
-    if (file.endsWith('.ts')) {
+    if (file.endsWith('.ts') || file.endsWith('.js')) {
         const route = require(path.join(routesPath, file)).default;
         app.use(route.routes());
     }

@@ -109,7 +109,7 @@ userRouter.post('/user', validateMiddleware(userAddSchema), userController.addUs
  *       404:
  *         description: 用户未找到
  */
-userRouter.get('/user/:id', userController.getUserDetail);
+userRouter.get('/user', userController.getUserDetail);
 
 /**
  * @swagger
