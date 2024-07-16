@@ -3,49 +3,67 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const koa_1 = __importDefault(require("koa"));
-const koa_router_1 = __importDefault(require("koa-router"));
-const koa_bodyparser_1 = __importDefault(require("koa-bodyparser"));
-const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
-const verifyToken_1 = require("./middlewares/verifyToken");
-const app = new koa_1.default();
-const router = new koa_router_1.default();
+var dotenv_1 = __importDefault(require("dotenv"));
+/** 需要放到开头，以免调用和定义 secret 的值不一致 **/
+dotenv_1.default.config();
+var fs_1 = __importDefault(require("fs"));
+var path_1 = __importDefault(require("path"));
+var koa_1 = __importDefault(require("koa"));
+var koa_router_1 = __importDefault(require("koa-router"));
+var koa_bodyparser_1 = __importDefault(require("koa-bodyparser"));
+var cors_1 = __importDefault(require("@koa/cors"));
+var database_1 = __importDefault(require("./database"));
+var koa_compress_1 = __importDefault(require("koa-compress"));
+var koa_static_1 = __importDefault(require("koa-static"));
+var authMiddleware_1 = require("./middlewares/authMiddleware");
+var responseTimeMiddleware_1 = __importDefault(require("./middlewares/responseTimeMiddleware"));
+var handleUndefinedRoutes_1 = __importDefault(require("./middlewares/handleUndefinedRoutes"));
+var loggerMiddleware_1 = __importDefault(require("./middlewares/loggerMiddleware"));
+var errorMiddleware_1 = __importDefault(require("./middlewares/errorMiddleware"));
+var rateLimitMiddleware_1 = __importDefault(require("./middlewares/rateLimitMiddleware"));
+var swaggerMiddleware_1 = __importDefault(require("./middlewares/swaggerMiddleware"));
+var helmetMiddleware_1 = __importDefault(require("./middlewares/helmetMiddleware"));
+var app = new koa_1.default();
+var router = new koa_router_1.default();
+// 连接数据库
+(0, database_1.default)();
+// 使用错误中间件
+app.use(errorMiddleware_1.default);
+// 使用 helmet 中间件增强安全性
+app.use(helmetMiddleware_1.default);
+// 设置跨域
+app.use((0, cors_1.default)());
 // 处理表单提交
 app.use((0, koa_bodyparser_1.default)());
-// logger
-app.use(async (ctx, next) => {
-    await next();
-    const rt = ctx.response.get('X-Response-Time');
-    console.log(`${ctx.method} ${ctx.url} - ${rt}`);
-});
-// x-response-time
-app.use(async (ctx, next) => {
-    const start = Date.now();
-    await next();
-    const ms = Date.now() - start;
-    ctx.set('X-Response-Time', `${ms}ms`);
-    console.log('set X-Response-Time');
-});
-const secret = 'your-secret-key'; // 生成和验证JWT的密钥，应该从环境变量或配置中获取
-// Middleware to intercept requests and check JWT token
-app.use((0, verifyToken_1.verifyToken)(secret).unless({
-    path: [/^\/public/, '/login', '/logout']
-}));
-// 登录路由
-router.post('/login', async (ctx) => {
-    const { username, password } = ctx.request.body;
-    // 这里应该有逻辑来验证用户名和密码
-    if (username === 'admin' && password === 'password') {
-        const token = jsonwebtoken_1.default.sign({ username }, secret, { expiresIn: '1h' });
-        ctx.body = { message: '登录成功', token };
-    }
-    else {
-        ctx.status = 401;
-        ctx.body = { message: 'Authentication Failed' };
+// 响应时间中间件
+app.use(responseTimeMiddleware_1.default);
+// 日志中间件
+app.use(loggerMiddleware_1.default);
+// 响应压缩
+app.use((0, koa_compress_1.default)());
+// 添加限流中间件，防止DDOS攻击
+app.use(rateLimitMiddleware_1.default);
+// 静态文件服务
+app.use((0, koa_static_1.default)('./public'));
+// 使用 Swagger 中间件
+app.use(swaggerMiddleware_1.default);
+// 添加 token 拦截中间件
+app.use(authMiddleware_1.tokenInterceptorErrorMiddleware)
+    .use(authMiddleware_1.tokenInterceptorWhiteListMiddleware)
+    .use(authMiddleware_1.tokenInterceptorBlackListMiddleware);
+// 批量导入 routes 目录下的路由
+var routesPath = path_1.default.join(__dirname, 'routes');
+fs_1.default.readdirSync(routesPath).forEach(function (file) {
+    if (file.endsWith('.ts')) {
+        var route = require(path_1.default.join(routesPath, file)).default;
+        app.use(route.routes());
     }
 });
+// 使用处理未定义的接口的中间件
+app.use(handleUndefinedRoutes_1.default);
+// 将路由中间件添加到应用中
 app.use(router.routes()).use(router.allowedMethods());
-const port = 3000;
-app.listen(port, () => {
-    console.log(`Server running on port ${port}`);
+var port = process.env.PORT || 3000;
+app.listen(port, function () {
+    console.log("Server running on port ".concat(port));
 });

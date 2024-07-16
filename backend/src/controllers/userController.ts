@@ -1,7 +1,6 @@
 import {paginate} from '../utils/paginate'; // 导入分页函数
 import {IUser, User} from '../models/User'; // 导入用户模型和接口
 import {sendSuccessResponse, sendErrorResponse} from '../helpers/responseHelper';
-import {Context} from "koa";
 import {createUser, findUserByEmail, findUserByUsername} from "../services/userService";
 import bcrypt from "bcryptjs";
 import {nanoid} from "nanoid"; // 导入成功和失败响应函数
