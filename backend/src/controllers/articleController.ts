@@ -29,7 +29,7 @@ const articleController = {
 
     /** 添加文章 **/
     addArticle: async (ctx: any) => {
-        const {articleId, articleParentId, title, content} = ctx.request.body as IArticle;
+        const {id, parentId, title, content} = ctx.request.body as IArticle;
         const user = await User.findOne({username: ctx.state.user.username});
         if (!user) {
             sendErrorResponse(ctx, 500, 'User not found');
@@ -38,8 +38,8 @@ const articleController = {
         try {
             const newArticle = new Article({
                 userId: user?.id,
-                articleId,
-                articleParentId,
+                id,
+                parentId,
                 title,
                 content,
                 created: Date.now(), // 设置创建时间
@@ -54,9 +54,9 @@ const articleController = {
 
     /** 获取文章详情 **/
     getArticleDetail: async (ctx: any) => {
-        const articleId = ctx.params.id;
+        const id = ctx.params.id;
         try {
-            const article = await Article.findOne({ articleId });
+            const article = await Article.findOne({ id });
             if (!article) {
                 sendErrorResponse(ctx, 404, 'Article not found');
                 return;
@@ -71,8 +71,8 @@ const articleController = {
     updateArticle: async (ctx: Context) => {
         const updatedData = ctx.request.body as IArticle;
         try {
-            const articleId = updatedData.articleId
-            const article = await Article.findOne({ articleId });
+            const id = updatedData.id
+            const article = await Article.findOne({ id });
             if (!article) {
                 sendErrorResponse(ctx, 404, 'Article not found');
                 return;
@@ -92,7 +92,7 @@ const articleController = {
     deleteArticle: async (ctx: Context) => {
         const ids = ctx.params.ids;
         try {
-            const result = await Article.deleteMany({articleId: {$in: ids.split(',').map((i: string) => i.trim())}});
+            const result = await Article.deleteMany({id: {$in: ids.split(',').map((i: string) => i.trim())}});
             sendSuccessResponse(ctx, result);
         } catch (error: any) {
             sendErrorResponse(ctx, 500, error.message);

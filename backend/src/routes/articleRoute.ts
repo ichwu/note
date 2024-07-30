@@ -46,7 +46,7 @@ const router = new Router();
  *                   items:
  *                     type: object
  *                     properties:
- *                       articleId:
+ *                       id:
  *                         type: string
  *                         example: "article123"
  *                       title:
@@ -73,10 +73,10 @@ router.get('/articles', articleController.getAllArticles);
  *           schema:
  *             type: object
  *             properties:
- *               articleId:
+ *               id:
  *                 type: string
  *                 example: "article123"
- *               articleParentId:
+ *               parentId:
  *                 type: string
  *                 example: "parent123"
  *               title:
@@ -116,7 +116,7 @@ router.post('/article', validateMiddleware(articleAddSchema), articleController.
  *             schema:
  *               type: object
  *               properties:
- *                 articleId:
+ *                 id:
  *                   type: string
  *                   example: "article123"
  *                 title:
@@ -145,10 +145,10 @@ router.get('/article/:id', articleController.getArticleDetail);
  *           schema:
  *             type: object
  *             properties:
- *               articleId:
+ *               id:
  *                 type: string
  *                 example: "article123"
- *               articleParentId:
+ *               parentId:
  *                 type: string
  *                 example: "parent123"
  *               title:
