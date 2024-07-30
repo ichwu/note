@@ -2,6 +2,7 @@ import {Context, Next} from 'koa';
 import koaJwt from 'koa-jwt';
 import { Blocklist } from "../models/Blocklist";
 import { sendErrorResponse } from "../helpers/responseHelper";
+import {User} from "../models/User";
 
 const secret = process.env.TOKEN_SECRET || 'your-secret-key'
 
@@ -29,6 +30,15 @@ export const tokenInterceptorBlackListMiddleware = async (ctx: Context, next: Ne
                 sendErrorResponse(ctx, 401, 'Token is blacklisted')
                 return;
             }
+            // 为 ctx.state.user 添加 userId 属性
+            const username = ctx.state.user.username
+            const user = await User.findOne({username: username});
+            // 如果未找到用户，则发送 404 错误响应
+            if (!user) {
+                sendErrorResponse(ctx, 404, 'User not found');
+                return;
+            }
+            ctx.state.user.userId = user.id
             // 然后继续执行下一个中间件
             await next();
         } catch (error: any) {

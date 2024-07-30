@@ -12,6 +12,10 @@ const articleController = {
     /** 获取所有文章 **/
     getAllArticles: async (ctx: any) => {
         const queryParams: QueryParams = {};
+
+        // 按用户区分数据
+        queryParams.userId = ctx.state.user.userId
+
         // 如果请求中包含参数，则设置模糊查询条件
         if (ctx.query.title) {
             queryParams['username'] = {$regex: new RegExp(ctx.query.tile, 'i')};
