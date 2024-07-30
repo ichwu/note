@@ -1,4 +1,4 @@
-import {paginate} from '../utils/paginate'; // 导入分页函数
+import {paginationHelper} from '../helpers/paginationHelper'; // 导入分页函数
 import {IUser, User} from '../models/User'; // 导入用户模型和接口
 import {sendSuccessResponse, sendErrorResponse} from '../helpers/responseHelper';
 import {createUser, findUserByEmail, findUserByUsername} from "../services/userService";
@@ -19,7 +19,7 @@ const userController = {
         }
         try {
             // 使用 paginate 函数对用户模型进行分页查询
-            const {data, pagination} = await paginate<IUser>(User, ctx, queryParams);
+            const {data, pagination} = await paginationHelper<IUser>(User, ctx, queryParams);
             // 发送成功响应，返回分页数据和查询结果
             sendSuccessResponse(ctx, {pagination, rows: data});
         } catch (error: any) {

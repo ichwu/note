@@ -6,7 +6,7 @@ interface QueryParams {
 }
 
 // 分页处理函数
-export const paginate = async <T extends Document>(
+export const paginationHelper = async <T extends Document>(
     model: Model<T>,
     ctx: ParameterizedContext,
     queryParams: QueryParams = {}

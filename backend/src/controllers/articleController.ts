@@ -2,7 +2,7 @@ import {Context} from 'koa';
 import {sendSuccessResponse, sendErrorResponse} from '../helpers/responseHelper';
 import {IArticle, Article} from '../models/Article';
 import {User} from "../models/User";
-import {paginate} from "../utils/paginate";
+import {paginationHelper} from "../helpers/paginationHelper";
 
 interface QueryParams {
     [key: string]: any;
@@ -18,7 +18,7 @@ const articleController = {
         }
         try {
             // 使用 paginate 进行分页查询
-            const {data, pagination} = await paginate<IArticle>(Article, ctx, queryParams);
+            const {data, pagination} = await paginationHelper<IArticle>(Article, ctx, queryParams);
             // 发送成功响应，返回分页数据和查询结果
             sendSuccessResponse(ctx, {pagination, rows: data});
         } catch (error: any) {

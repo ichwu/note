@@ -1,6 +1,6 @@
 import {Context, Next} from 'koa';
 import koaJwt from 'koa-jwt';
-import {TokenBlocklist} from "../models/TokenBlocklist";
+import { Blocklist } from "../models/Blocklist";
 import { sendErrorResponse } from "../helpers/responseHelper";
 
 const secret = process.env.TOKEN_SECRET || 'your-secret-key'
@@ -24,7 +24,7 @@ export const tokenInterceptorBlackListMiddleware = async (ctx: Context, next: Ne
             // 如果需要验证的路径，可以在这里执行一些自定义逻辑
             const token = ctx.request.headers.authorization?.split(' ')[1] || '';
             // 检查 Token 是否在黑名单中
-            const blacklistedToken = await TokenBlocklist.findOne({token});
+            const blacklistedToken = await Blocklist.findOne({token});
             if (blacklistedToken) {
                 sendErrorResponse(ctx, 401, 'Token is blacklisted')
                 return;

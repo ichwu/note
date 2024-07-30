@@ -2,7 +2,7 @@ import { Context } from 'koa'; // 导入 Koa 的 Context 类型
 import jwt from 'jsonwebtoken'; // 导入 JWT 模块
 import bcrypt from 'bcryptjs'; // 导入 bcrypt 模块
 import { findUserByEmail, findUserByUsername, createUser } from '../services/userService'; // 导入用户服务函数
-import { addToBlocklist } from '../services/tokenBlocklistService'; // 导入令牌黑名单服务函数
+import { addToBlocklist } from '../services/blocklistService'; // 导入令牌黑名单服务函数
 import { sendSuccessResponse, sendErrorResponse } from '../helpers/responseHelper'; // 导入成功和失败响应函数
 import { nanoid } from "nanoid";
 
