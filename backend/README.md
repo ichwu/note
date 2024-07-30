@@ -24,6 +24,11 @@ tsc
 scp -r dist aliyun:/root/mongo-server/ 
 ```
 
+上传项目到服务器
+```shell
+scp -r . aliyun:/root/mongo-server/
+```
+
 ApiFox 文档地址
 ```shell
 nodemon --watch src --exec ts-node src/server.ts 

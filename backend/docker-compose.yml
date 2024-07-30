@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    container_name: mongo-server
+    ports:
+      - "3000:3000"
+      - "3001:3001"
+    volumes:
+      - .:/usr/src/app
+    environment:
+      NODE_ENV: development
+      PORT: 3000
+      WS: 3001
+      TOKEN_SECRET: mongodb-server-token-secret
+      DATABASE_URL: mongodb://wuchi:33nXnuXs@47.107.60.51:27017/server?authSource=admin
