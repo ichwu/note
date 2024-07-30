@@ -13,6 +13,16 @@ DATABASE_URL=mongodb://username:password@ip:27017/databaseName?authSource=admin
 nodemon --watch src --exec ts-node src/server.ts 
 ```
 
+打包
+```shell
+tsc 
+```
+
+上传到服务器
+```shell
+scp -r dist aliyun:/root/mongo-server/ 
+```
+
 ApiFox 文档地址
 ```shell
 nodemon --watch src --exec ts-node src/server.ts 
