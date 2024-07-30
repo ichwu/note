@@ -36,7 +36,7 @@ const articleController = {
             return
         }
         try {
-            const newArticle = new Article({
+            const article = new Article({
                 userId: user?.id,
                 id,
                 parentId,
@@ -45,8 +45,8 @@ const articleController = {
                 created: Date.now(), // 设置创建时间
                 modify: Date.now() // 设置修改时间
             });
-            await newArticle.save();
-            sendSuccessResponse(ctx, newArticle);
+            await article.save();
+            sendSuccessResponse(ctx, article.toJSON());
         } catch (error: any) {
             sendErrorResponse(ctx, 500, error.message);
         }
@@ -61,7 +61,7 @@ const articleController = {
                 sendErrorResponse(ctx, 404, 'Article not found');
                 return;
             }
-            sendSuccessResponse(ctx, article);
+            sendSuccessResponse(ctx, article.toJSON());
         } catch (error: any) {
             sendErrorResponse(ctx, 500, error.message);
         }
@@ -82,7 +82,7 @@ const articleController = {
             updatedData.modify = Date.now();
             Object.assign(article, updatedData);
             await article.save();
-            sendSuccessResponse(ctx, article);
+            sendSuccessResponse(ctx, article.toJSON());
         } catch (error: any) {
             sendErrorResponse(ctx, 500, error.message);
         }

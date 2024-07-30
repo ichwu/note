@@ -75,17 +75,10 @@ userRouter.post('/user', validateMiddleware(userAddSchema), userController.addUs
 
 /**
  * @swagger
- * /user/{id}:
+ * /user:
  *   get:
  *     summary: 获取用户详情
  *     tags: [Users]
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *         description: 用户的唯一 ID
  *     responses:
  *       200:
  *         description: 成功获取用户详情

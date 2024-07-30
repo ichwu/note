@@ -48,14 +48,14 @@ const userController = {
             // 使用 bcrypt 对密码进行哈希处理
             const hashedPassword = await bcrypt.hash(password, 10);
             // 将用户名、哈希后的密码和邮箱存储到数据库中
-            await createUser({
+            const user = await createUser({
                 id: nanoid(10),
                 username,
                 password: hashedPassword,
                 email,
                 role: username === 'admin' ? 'admin' : 'user' });
             // 发送成功响应
-            sendSuccessResponse(ctx);
+            sendSuccessResponse(ctx, user.toJSON());
         } catch (error: any) {
             sendErrorResponse(ctx, 500, error.message);
         }
@@ -73,7 +73,7 @@ const userController = {
                 return;
             }
             // 发送成功响应，返回查询到的用户信息
-            sendSuccessResponse(ctx, user);
+            sendSuccessResponse(ctx, user.toJSON());
         } catch (error: any) {
             // 捕获数据库操作中的错误，并发送错误响应
             sendErrorResponse(ctx, 500, error.message);
@@ -117,7 +117,7 @@ const userController = {
             // 保存更新后的用户信息到数据库
             await user.save();
             // 发送成功响应，返回更新后的用户信息
-            sendSuccessResponse(ctx, user);
+            sendSuccessResponse(ctx, user.toJSON());
         } catch (error: any) {
             // 捕获数据库操作中的错误，并发送错误响应
             sendErrorResponse(ctx, 500, error.message);
