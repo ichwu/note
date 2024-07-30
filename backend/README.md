@@ -4,7 +4,8 @@ MongoDB Server
 创建.env文件
 ```text
 TOKEN_SECRET=your-secret-key
-PORT=3000
+PORT=8080
+WS=8081
 DATABASE_URL=mongodb://username:password@ip:27017/databaseName?authSource=admin
 ```
 

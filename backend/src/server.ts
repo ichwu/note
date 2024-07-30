@@ -22,6 +22,8 @@ import errorMiddleware from "./middlewares/errorMiddleware";
 import rateLimitMiddleware from "./middlewares/rateLimitMiddleware";
 import swaggerMiddleware from "./middlewares/swaggerMiddleware";
 import helmetMiddleware from "./middlewares/helmetMiddleware";
+import WebSocketService from './websocket/websocketServer';
+import { setWebSocketService } from './controllers/articleController';
 
 const app = new Koa();
 const router = new Router();
@@ -83,3 +85,10 @@ const port = process.env.PORT || 3000;
 app.listen(port, () => {
     console.log(`Server running on port ${port}`);
 });
+
+// 创建并初始化WebSocket服务
+const wsPort = process.env.WS || 3001;
+const websocketService = new WebSocketService(Number(wsPort));
+
+// 注入WebSocket服务到articleController
+setWebSocketService(websocketService);

@@ -3,10 +3,19 @@ import {sendSuccessResponse, sendErrorResponse} from '../helpers/responseHelper'
 import {IArticle, Article} from '../models/Article';
 import {User} from "../models/User";
 import {paginationHelper} from "../helpers/paginationHelper";
+import WebSocketService from '../websocket/websocketServer';
 
 interface QueryParams {
     [key: string]: any;
 }
+
+// 在这里导入 WebSocketService 实例
+let websocketService: WebSocketService | null = null;
+
+// 初始化 WebSocket 服务实例的函数
+export const setWebSocketService = (wsService: WebSocketService) => {
+    websocketService = wsService;
+};
 
 const articleController = {
     /** 获取所有文章 **/
@@ -51,6 +60,8 @@ const articleController = {
             });
             await article.save();
             sendSuccessResponse(ctx, article.toJSON());
+            // 通知所有客户端文章已更新
+            websocketService?.notifyClients(article.id);
         } catch (error: any) {
             sendErrorResponse(ctx, 500, error.message);
         }
@@ -87,6 +98,8 @@ const articleController = {
             Object.assign(article, updatedData);
             await article.save();
             sendSuccessResponse(ctx, article.toJSON());
+            // 通知所有客户端文章已更新
+            websocketService?.notifyClients(article.id);
         } catch (error: any) {
             sendErrorResponse(ctx, 500, error.message);
         }
@@ -98,6 +111,8 @@ const articleController = {
         try {
             const result = await Article.deleteMany({id: {$in: ids.split(',').map((i: string) => i.trim())}});
             sendSuccessResponse(ctx, result);
+            // 通知所有客户端文章已删除
+            ids.split(',').forEach((id: string) => websocketService?.notifyClients(id.trim()));
         } catch (error: any) {
             sendErrorResponse(ctx, 500, error.message);
         }
