@@ -5,7 +5,6 @@ import fs from 'fs';
 import path from 'path';
 import Koa from 'koa';
 import Router from 'koa-router';
-import bodyParser from 'koa-bodyparser';
 import cors from '@koa/cors';
 import connectToDatabase from './database';
 import compress from 'koa-compress';
@@ -24,6 +23,7 @@ import swaggerMiddleware from "./middlewares/swaggerMiddleware";
 import helmetMiddleware from "./middlewares/helmetMiddleware";
 import WebSocketService from './websocket/websocketServer';
 import { setWebSocketService } from './controllers/articleController';
+import koaBodyMiddleware from "./middlewares/koaBodyMiddleware";
 
 const app = new Koa();
 const router = new Router();
@@ -40,8 +40,8 @@ app.use(helmetMiddleware);
 // 设置跨域
 app.use(cors());
 
-// 处理表单提交
-app.use(bodyParser());
+// 使用封装的 koa-body 中间件处理表单提交、文件上传
+app.use(koaBodyMiddleware);
 
 // 响应时间中间件
 app.use(responseTimeMiddleware);

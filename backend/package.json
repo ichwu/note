@@ -15,11 +15,13 @@
     "@types/koa-ratelimit": "^5.0.5",
     "@types/koa-static": "^4.0.4",
     "@types/swagger-jsdoc": "^6.0.4",
+    "ali-oss": "^6.20.0",
     "bcryptjs": "^2.4.3",
     "dotenv": "^16.4.5",
     "joi": "^17.12.3",
     "jsonwebtoken": "^9.0.2",
     "koa": "^2.15.3",
+    "koa-body": "^6.0.1",
     "koa-bodyparser": "^4.4.1",
     "koa-compress": "^5.1.1",
     "koa-helmet": "^7.0.2",
@@ -36,6 +38,7 @@
     "ws": "^8.18.0"
   },
   "devDependencies": {
+    "@types/ali-oss": "^6.16.11",
     "@types/bcryptjs": "^2.4.6",
     "@types/jsonwebtoken": "^9.0.6",
     "@types/koa": "^2.15.0",
