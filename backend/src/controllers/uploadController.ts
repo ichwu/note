@@ -4,6 +4,7 @@ import OSS from 'ali-oss';
 import path from "path";
 import {calculateFileMD5} from "../helpers/fileHelper";
 import fs from "fs";
+import * as os from "node:os";
 // import { nanoid } from 'nanoid';
 
 const ossClient = new OSS({
@@ -34,8 +35,12 @@ const uploadController = {
                     const ext = path.extname(file.originalFilename as string);
                     const newFilename = `${md5}${ext}`;
 
+                    // 上传目录
+                    const ossPath = `AutoAdmin/${newFilename}`;
+
+
                     // 上传文件到阿里云 OSS
-                    const result = await ossClient.put(newFilename, file.filepath);
+                    const result = await ossClient.put(ossPath, file.filepath);
 
                     // 删除临时文件
                     fs.unlinkSync(file.filepath);
