@@ -4,8 +4,6 @@ import OSS from 'ali-oss';
 import path from "path";
 import {calculateFileMD5} from "../helpers/fileHelper";
 import fs from "fs";
-import * as os from "node:os";
-// import { nanoid } from 'nanoid';
 
 const ossClient = new OSS({
     region: process.env.OSS_REGION,
@@ -38,7 +36,6 @@ const uploadController = {
                     // 上传目录
                     const ossPath = `AutoAdmin/${newFilename}`;
 
-
                     // 上传文件到阿里云 OSS
                     const result = await ossClient.put(ossPath, file.filepath);
 
@@ -61,9 +58,6 @@ const uploadController = {
 
             // 等待所有上传操作完成
             const results = await Promise.all(uploadPromises);
-
-            // console.log('fileArray: ', fileArray)
-            // console.log('result: ', results)
 
             // 检查是否有错误发生
             const hasErrors = results.some(result => result.error);
