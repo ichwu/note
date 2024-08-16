@@ -7,6 +7,12 @@ TOKEN_SECRET=your-secret-key
 PORT=8080
 WS=8081
 DATABASE_URL=mongodb://username:password@ip:27017/databaseName?authSource=admin
+
+# 阿里云 OSS
+OSS_REGION=
+OSS_ACCESS_KEY_ID=
+OSS_ACCESS_KEY_SECRET=
+OSS_BUCKET_NAME=
 ```
 
 测试运行
